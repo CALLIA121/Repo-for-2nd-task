@@ -3,15 +3,34 @@ import random
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget
 from PyQt6.QtGui import QPainter, QColor
 from PyQt6.QtCore import Qt
-from PyQt6 import uic
 
-class MainWindow(QMainWindow):
+
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(800, 600)
+
+        self.centralwidget = QWidget(MainWindow)
+        self.centralwidget.setObjectName("centralwidget")
+
+        self.verticalLayout = QVBoxLayout(self.centralwidget)
+        self.verticalLayout.setObjectName("verticalLayout")
+
+        self.pushButton = QPushButton(self.centralwidget)
+        self.pushButton.setObjectName("pushButton")
+        self.pushButton.setText("Draw Circles")
+
+        self.verticalLayout.addWidget(self.pushButton)
+
+        MainWindow.setCentralWidget(self.centralwidget)
+
+
+class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi("UI.ui", self)
+        self.setupUi(self)
 
-        self.button = self.findChild(QPushButton, "pushButton")
-        self.button.clicked.connect(self.draw_circles)
+        self.pushButton.clicked.connect(self.draw_circles)
 
         self.circles = []
 
@@ -25,20 +44,23 @@ class MainWindow(QMainWindow):
             diameter = random.randint(10, 100)
             x = random.randint(0, self.width() - diameter)
             y = random.randint(0, self.height() - diameter)
-            self.circles.append((x, y, diameter))
+            color = QColor(random.randint(0, 255), random.randint(
+                0, 255), random.randint(0, 255))
+            self.circles.append((x, y, diameter, color))
 
         self.update()
 
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setBrush(QColor("yellow"))
-        painter.setPen(Qt.PenStyle.NoPen)
 
-        for x, y, diameter in self.circles:
+        for x, y, diameter, color in self.circles:
+            painter.setBrush(color)
+            painter.setPen(Qt.PenStyle.NoPen)
             painter.drawEllipse(x, y, diameter, diameter)
 
         super().paintEvent(event)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
